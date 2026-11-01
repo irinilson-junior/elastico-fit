@@ -1,6 +1,6 @@
 /* Service worker do Elástico Fit.
    Para publicar uma nova versão do app, troque o número em CACHE (v1 -> v2). */
-var CACHE = "elastico-fit-v5";
+var CACHE = "elastico-fit-v8";
 var SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {

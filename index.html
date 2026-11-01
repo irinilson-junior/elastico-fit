@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#15202A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4F3FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11101C" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Elástico Fit">
@@ -16,7 +16,7 @@
 <title>Elástico Fit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
 <style>
 :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;font:14px system-ui,sans-serif}
@@ -26,24 +26,24 @@ img{max-width:100%}
 <style>
 /* Layout: app de celular, cabeçalho fixo, três seções na barra inferior, treino do dia em lista com checagem e cronômetro de descanso. */
 :root {
-  --bg: #EDF0F2; --surface: #FFFFFF; --ink: #12202B; --muted: #586672; --line: #D3DAE0;
-  --accent: #0B6E5A; --accent-ink: #FFFFFF; --accent-soft: #D6EEE6; --shirt: #3E6B8F; --pants: #1E2D3A; --skin: #D9B79F; --farleg: #7A8996; --fararm: #8FB0CB;
+  --bg: #F4F3FA; --surface: #FFFFFF; --ink: #1D1B33; --muted: #666380; --line: #E6E4F2;
+  --accent: #6A4DF5; --accent-2: #9B5CFF; --accent-ink: #FFFFFF; --accent-soft: #ECE8FF; --shadow: 0 6px 20px rgba(60,40,140,.08); --shirt: #3E6B8F; --pants: #1E2D3A; --skin: #D9B79F; --farleg: #7A8996; --fararm: #8FB0CB;
   --b-amarelo: #D9A800; --b-verde: #2E9B4F; --b-azul: #2C6FD1; --b-preto: #27303A;
-  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
-  --text: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Outfit", "Avenir Next", "Segoe UI", sans-serif;
+  --text: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --nav-h: calc(58px + env(safe-area-inset-bottom, 0px));
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0D151B; --surface: #15202A; --ink: #E8EEF2; --muted: #95A4B0; --line: #27353F;
-    --accent: #3ECFAC; --accent-ink: #05261E; --accent-soft: #123830; --shirt: #5B8FB8; --pants: #8FA3B5; --skin: #C9A088; --farleg: #566A7C; --fararm: #3F6488;
+    --bg: #11101C; --surface: #1B1A2B; --ink: #F2F0FF; --muted: #A5A2BF; --line: #2D2B45;
+    --accent: #9B86FF; --accent-2: #C08BFF; --accent-ink: #12102B; --accent-soft: #2A2550; --shadow: 0 6px 20px rgba(0,0,0,.35); --shirt: #5B8FB8; --pants: #8FA3B5; --skin: #C9A088; --farleg: #566A7C; --fararm: #3F6488;
     --b-amarelo: #F0C419; --b-verde: #45C26B; --b-azul: #5C9BFF; --b-preto: #C3CBD3;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0D151B; --surface: #15202A; --ink: #E8EEF2; --muted: #95A4B0; --line: #27353F;
-  --accent: #3ECFAC; --accent-ink: #05261E; --accent-soft: #123830; --shirt: #5B8FB8; --pants: #8FA3B5; --skin: #C9A088; --farleg: #566A7C; --fararm: #3F6488;
+  --bg: #11101C; --surface: #1B1A2B; --ink: #F2F0FF; --muted: #A5A2BF; --line: #2D2B45;
+  --accent: #9B86FF; --accent-2: #C08BFF; --accent-ink: #12102B; --accent-soft: #2A2550; --shadow: 0 6px 20px rgba(0,0,0,.35); --shirt: #5B8FB8; --pants: #8FA3B5; --skin: #C9A088; --farleg: #566A7C; --fararm: #3F6488;
   --b-amarelo: #F0C419; --b-verde: #45C26B; --b-azul: #5C9BFF; --b-preto: #C3CBD3;
   color-scheme: dark;
 }
@@ -233,6 +233,75 @@ ul.exs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction:
 .tabs a[aria-current="page"] { color: var(--accent); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 @media (prefers-reduced-motion: reduce) { .bar i, .toast { transition: none; } }
+
+/* ===== visual de app de coaching: cartões arredondados, cores vivas, botões em pílula ===== */
+body { font-size: 16px; }
+.top { border-bottom: 0; background: var(--bg); }
+body::before { background: var(--bg); }
+.top .wrap { height: 60px; }
+.brand { font-size: 22px; letter-spacing: 0; text-transform: none; font-weight: 700; }
+.mbtn { background: var(--surface); border: 0; box-shadow: var(--shadow); color: var(--accent); }
+main { padding-block: 8px 20px; gap: 18px; }
+.intro h1, .page-title { font-size: 34px; line-height: 1.08; letter-spacing: -.01em; }
+.eyebrow { letter-spacing: .06em; }
+.chip { border: 0; border-radius: 999px; background: var(--surface); box-shadow: var(--shadow); padding: 0 16px; font-weight: 600; }
+.chip[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.card { border: 0; border-radius: 22px; box-shadow: var(--shadow); padding: 18px; }
+.cards { gap: 14px; }
+a.prog { position: relative; overflow: hidden; color: #fff; padding: 20px; min-height: 176px; background: linear-gradient(135deg, #6A4DF5, #9B5CFF); isolation: isolate; }
+a.prog::after { content: ""; position: absolute; width: 190px; height: 190px; right: -50px; top: -60px; border-radius: 50%; background: rgba(255,255,255,.14); z-index: -1; }
+a.prog::before { content: ""; position: absolute; width: 120px; height: 120px; right: 30px; bottom: -70px; border-radius: 50%; background: rgba(255,255,255,.10); z-index: -1; }
+.cards > a.prog:nth-child(7n+2) { background: linear-gradient(135deg, #D92D4F, #F26B3A); }
+.cards > a.prog:nth-child(7n+3) { background: linear-gradient(135deg, #087F72, #14A37F); }
+.cards > a.prog:nth-child(7n+4) { background: linear-gradient(135deg, #2456E0, #4A7BFF); }
+.cards > a.prog:nth-child(7n+5) { background: linear-gradient(135deg, #A02BC0, #DB45A0); }
+.cards > a.prog:nth-child(7n+6) { background: linear-gradient(135deg, #176A7B, #2C93A6); }
+.cards > a.prog:nth-child(7n+7) { background: linear-gradient(135deg, #B8650A, #E08A00); }
+a.prog:active { background-blend-mode: multiply; filter: brightness(.95); }
+a.prog .eyebrow, a.prog .meta, a.prog .freq b, a.prog .freq span, a.prog p.desc, a.prog .prog-foot { color: #fff; }
+a.prog .eyebrow, a.prog .meta, a.prog .freq span { opacity: .88; }
+a.prog h3 { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+.freq b { font-size: 38px; }
+.prog-foot { margin-top: auto; }
+.prog-foot span:last-child { background: rgba(255,255,255,.22); border-radius: 999px; padding: 6px 14px; }
+.back { color: var(--accent); font-weight: 600; }
+.days { gap: 10px; }
+.day { border: 0; border-radius: 18px; box-shadow: var(--shadow); min-height: 68px; }
+.day[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.day-head h2 { font-size: 30px; letter-spacing: -.01em; }
+.bar { height: 8px; border-radius: 99px; }
+.bar i { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; }
+.ex { border: 0; border-radius: 22px; box-shadow: var(--shadow); padding: 14px; }
+.ex.done { background: var(--accent-soft); box-shadow: none; }
+.chk { border-radius: 50%; border: 2px solid var(--line); background: transparent; }
+.chk[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; }
+.ex h4 { font-family: var(--display); font-size: 19px; font-weight: 600; }
+.vol b { font-size: 22px; font-weight: 600; color: var(--accent); }
+.btn { border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent); padding: 0 18px; }
+.btn.video { background: var(--accent-soft); color: var(--accent); }
+.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border-radius: 999px; box-shadow: 0 8px 20px rgba(106,77,245,.35); }
+.btn.danger { background: var(--surface); color: var(--muted); }
+.fig { border-radius: 18px; background: linear-gradient(180deg, var(--accent-soft), var(--bg)); }
+.fig .torso, .fig .arm, .fig .leg, .fig .farleg, .fig .fararm, .fig .hand, .fig .farhand, .fig .head { stroke: var(--accent-soft); }
+.search { border: 0; border-radius: 999px; box-shadow: var(--shadow); padding: 0 20px; }
+.wd i { border-color: var(--line); background: var(--surface); }
+.wd.on i { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; }
+.stat b { font-size: 42px; color: var(--accent); }
+.hist li { border-top-color: var(--line); }
+.timer { border-radius: 24px 24px 0 0; background: var(--ink); box-shadow: 0 -8px 30px rgba(20,10,60,.25); }
+.timer button { border-radius: 999px; }
+.toast { border-radius: 999px; background: var(--ink); color: var(--bg); }
+.tabs { border-top: 0; border-radius: 24px 24px 0 0; box-shadow: 0 -6px 24px rgba(60,40,140,.12); }
+.tabs a { position: relative; font-size: 12px; }
+.tabs a[aria-current="page"]::before { content: ""; position: absolute; top: 6px; width: 48px; height: 30px; border-radius: 99px; background: var(--accent-soft); z-index: -1; }
+.tabs a[aria-current="page"] { z-index: 0; }
+.msheet { border-radius: 28px 28px 0 0; border-top: 0; }
+.mtabs button { border: 0; border-radius: 999px; background: var(--bg); }
+.mrow label.pick, .mrow button.mb { border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.mrow button.go { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.mpre button { border: 0; background: var(--accent-soft); color: var(--accent); }
+.mrow input[type=url] { border: 0; border-radius: 999px; background: var(--bg); padding: 0 16px; }
+.mtabs button[aria-pressed="true"], .mpre button[aria-pressed="true"] { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
 </style>
 </head>
 <body>
@@ -1119,7 +1188,7 @@ var FIG = (function () {
   audio.addEventListener("ended", function () { mnext(); });
   audio.addEventListener("play", mbtnState);
   audio.addEventListener("pause", mbtnState);
-  var bt = { h: null, gain: null, next: 0, n: 0 };
+  var bt = { h: null, gain: null, next: 0, n: 0, t0: 0, phase: "" };
   function playing() { return (!audio.paused && !!audio.src) || mus.beat; }
   function mbtnState() { var b = $("#mbtn"); if (b) { b.classList.toggle("on", playing()); b.setAttribute("aria-pressed", playing() ? "true" : "false"); } }
   function mplay(i) {
@@ -1142,10 +1211,10 @@ var FIG = (function () {
   /* estilos de batida: 16 passos por compasso (x = toca, o = toque fraco) */
   var N = null;
   var STY = [
-    { n: "Eletrônica", bpm: 128, k: "x...x...x...x...", c: "....x.......x...", h: "o.o.o.o.o.o.o.o.", o: "..x...x...x...x.", bass: "saw", arp: [0, 12, 7, 12, 3, 12, 7, 15], line: [N, N, 0, N, N, N, 0, N, N, N, 3, N, N, N, 5, N] },
-    { n: "Funk", bpm: 130, k: "x..x..x...x.x...", c: "....x..x....x..x", h: "x.x.x.x.x.x.x.x.", o: "......x.......x.", bass: "808", line: [0, N, N, 0, N, N, 3, N, N, N, 0, N, -2, N, N, N] },
-    { n: "Trap", bpm: 140, k: "x......x..x.....", c: "........x.......", h: "x.x.x.x.x.x.xxxx", o: "......x.........", bass: "808", line: [0, N, N, N, N, N, N, 0, N, N, -2, N, N, N, N, N] },
-    { n: "Rock", bpm: 120, k: "x.......x.x.....", c: "....x.......x...", sn: true, h: "x.x.x.x.x.x.x.x.", o: "", bass: "saw", line: [0, N, 0, N, 0, N, 0, N, 3, N, 3, N, 5, N, 5, N] }
+    { n: "Eletrônica", bpm: 128, k: "x...x...x...x...", c: "....x.......x...", h: "o.o.o.o.o.o.o.o.", o: "..x...x...x...x.", bass: "saw", arp: [0, 12, 7, 12, 3, 12, 7, 15], line: [N, N, 0, N, N, N, 0, N, N, N, 3, N, N, N, 5, N], k2: "..............x.", line2: [N, N, 0, N, N, N, 0, N, N, N, 5, N, N, N, 3, N] },
+    { n: "Funk", bpm: 130, k: "x..x..x...x.x...", c: "....x..x....x..x", h: "x.x.x.x.x.x.x.x.", o: "......x.......x.", bass: "808", line: [0, N, N, 0, N, N, 3, N, N, N, 0, N, -2, N, N, N], k2: "..x.......x.....", line2: [0, N, N, 0, N, N, 5, N, N, N, 3, N, 0, N, N, N] },
+    { n: "Trap", bpm: 140, k: "x......x..x.....", c: "........x.......", h: "x.x.x.x.x.x.xxxx", o: "......x.........", bass: "808", line: [0, N, N, N, N, N, N, 0, N, N, -2, N, N, N, N, N], k2: "..x...........x.", line2: [0, N, N, N, N, N, N, 0, N, N, N, N, -2, N, N, N] },
+    { n: "Rock", bpm: 120, k: "x.......x.x.....", c: "....x.......x...", sn: true, h: "x.x.x.x.x.x.x.x.", o: "", bass: "saw", line: [0, N, 0, N, 0, N, 0, N, 3, N, 3, N, 5, N, 5, N], k2: "..x.....x.......", line2: [0, N, 0, N, 3, N, 3, N, 5, N, 5, N, 7, N, 5, N] }
   ];
   var nbuf = null;
   function noiseSrc(c) {
@@ -1168,25 +1237,47 @@ var FIG = (function () {
     out.connect(bt.gain); o.start(t); o.stop(t + dur + 0.02);
   }
   function hz(semi, base) { return base * Math.pow(2, semi / 12); }
+  /* a batida evolui sozinha: ciclo de 24 minutos com aquecimento, subidas, explosões, respiros e pico */
+  var CICLO = 24;
+  var SEC = [[0, "Aquecimento", "intro"], [1.5, "Base", "base"], [4, "Subindo", "build"], [7, "Batida cheia", "full"], [10.5, "Explosão", "drop"], [13, "Respiro", "brk"], [15, "Subindo", "build"], [17, "Pico", "peak"], [20.5, "Volta ao ritmo", "reprise"]];
+  var LAY = {
+    intro: { k: 1, h: 1 }, base: { k: 1, c: 1, h: 1 }, build: { k: 1, c: 1, h: 1, b: 1 },
+    full: { k: 1, c: 1, h: 1, o: 1, b: 1, a: 1 }, drop: { k: 1, k2: 1, c: 1, h: 1, o: 1, b: 1, a: 1 },
+    brk: { h: 1, b: 1, a: 1, c: 2, soft: 1 }, peak: { k: 1, k2: 1, c: 1, h: 1, h16: 1, o: 1, b: 1, a: 1 },
+    reprise: { k: 1, c: 1, h: 1, b: 1 }
+  };
+  var HARM = [0, 5, 3, -2];
+  function secAt(sec) {
+    var m = (sec / 60) % CICLO, r = SEC[0];
+    for (var i = 0; i < SEC.length; i++) if (m >= SEC[i][0]) r = SEC[i];
+    return r;
+  }
   function beatSched() {
     var c = ac; if (!c || !bt.gain) return;
     var st = STY[mus.sty], step = 60 / mus.bpm / 4;
     while (bt.next < c.currentTime + 0.2) {
-      var i = bt.n % 16, t = bt.next;
-      if (st.k.charAt(i) === "x") { osc(t, "sine", 170, 42, 0.28, 1); nz(t, 0.02, "highpass", 3000, 0.4); }
-      if (st.c.charAt(i) === "x") {
-        if (st.sn) { osc(t, "triangle", 230, 180, 0.12, 0.6); nz(t, 0.16, "highpass", 1500, 0.7); }
+      var i = bt.n % 16, bar = Math.floor(bt.n / 16), t = bt.next;
+      var sc = secAt(bt.next - bt.t0), L = LAY[sc[2]];
+      if (bt.phase !== sc[1]) { bt.phase = sc[1]; var ph = $("#mphase"); if (ph) ph.textContent = "Agora: " + sc[1]; }
+      var hv = L.soft ? 0.5 : 1, tr = HARM[(bar >> 3) % 4];
+      var fill = L.c && bar % 8 === 7 && i >= 12;
+      if (L.k && (st.k.charAt(i) === "x" || (L.k2 && st.k2.charAt(i) === "x"))) { osc(t, "sine", 170, 42, 0.28, 1); nz(t, 0.02, "highpass", 3000, 0.4); }
+      if ((L.c === 1 && st.c.charAt(i) === "x") || (L.c === 2 && i === 12) || fill) {
+        if (st.sn) { osc(t, "triangle", 230, 180, 0.12, fill ? 0.5 : 0.6); nz(t, 0.16, "highpass", 1500, fill ? 0.5 : 0.7); }
         else { nz(t, 0.04, "bandpass", 1500, 0.8); nz(t + 0.014, 0.05, "bandpass", 1500, 0.8); nz(t + 0.03, 0.2, "bandpass", 1200, 0.7); }
       }
-      var h = st.h.charAt(i);
-      if (h === "x") nz(t, 0.05, "highpass", 8000, 0.35); else if (h === "o") nz(t, 0.04, "highpass", 8000, 0.18);
-      if (st.o.charAt(i) === "x") nz(t, 0.22, "highpass", 7000, 0.3);
-      var sm = st.line[i];
-      if (sm !== null) {
-        if (st.bass === "808") osc(t, "sine", hz(sm, 55) * 1.5, hz(sm, 55), 0.45, 0.9);
+      if (L.h) {
+        var h = L.h16 ? (i % 2 === 0 ? "x" : "o") : st.h.charAt(i);
+        if (h === "x") nz(t, 0.05, "highpass", 8000, 0.35 * hv); else if (h === "o") nz(t, 0.04, "highpass", 8000, 0.18 * hv);
+      }
+      if (L.o && st.o.charAt(i) === "x") nz(t, 0.22, "highpass", 7000, 0.3);
+      var sm = ((bar >> 2) & 1 ? st.line2 : st.line)[i];
+      if (L.b && sm !== null) {
+        sm += tr;
+        if (st.bass === "808") osc(t, "sine", hz(sm, 55) * 1.5, hz(sm, 55), 0.45, 0.9 * hv + 0.1);
         else osc(t, "sawtooth", hz(sm, 55), hz(sm, 55), step * 1.8, 0.45, 500);
       }
-      if (st.arp && i % 2 === 0) osc(t, "square", hz(st.arp[(i / 2) % st.arp.length], 220), hz(st.arp[(i / 2) % st.arp.length], 220), step * 1.6, 0.1, 2200);
+      if (L.a && st.arp && i % 2 === 0) { var an = hz(st.arp[(i / 2) % st.arp.length] + tr, 220); osc(t, "square", an, an, step * 1.6, 0.1 * hv + 0.02, 2200); }
       bt.next += step; bt.n++;
     }
   }
@@ -1196,7 +1287,7 @@ var FIG = (function () {
     if (!bt.gain) { bt.gain = c.createGain(); bt.gain.connect(mix); }
     bt.gain.gain.value = mus.vol;
     mus.beat = true; bt.n = 0;
-    var go = function () { bt.next = c.currentTime + 0.1; clearInterval(bt.h); bt.h = setInterval(beatSched, 40); beatSched(); };
+    var go = function () { bt.next = c.currentTime + 0.1; bt.t0 = bt.next; bt.phase = ""; clearInterval(bt.h); bt.h = setInterval(beatSched, 40); beatSched(); };
     if (c.state === "running") go(); else c.resume().then(go, go);
   }
   function beatStop() { mus.beat = false; clearInterval(bt.h); bt.h = null; }
@@ -1224,7 +1315,7 @@ var FIG = (function () {
       if (!mus.list.length) h += '<p class="mhint">Escolha músicas do seu celular (MP3, M4A...). Elas tocam enquanto você treina; nada é enviado para a internet.</p>';
     } else if (mus.tab === "batida") {
       h += '<div class="mrow"><button class="mb go" data-act="mtoggle">' + (mus.beat ? "Parar batida" : "Iniciar batida") + '</button></div>' +
-        '<div class="mpre">' + STY.map(function (x, i) { return '<button data-act="msty" data-i="' + i + '" aria-pressed="' + (mus.sty === i) + '">' + x.n + '</button>'; }).join("") + '</div><div class="mrow"><span>Ritmo</span><input type="range" min="80" max="170" step="2" value="' + mus.bpm + '" data-act="mbpm" aria-label="Batidas por minuto"><strong id="mbpmv">' + mus.bpm + '</strong></div>';
+        '<div class="mpre">' + STY.map(function (x, i) { return '<button data-act="msty" data-i="' + i + '" aria-pressed="' + (mus.sty === i) + '">' + x.n + '</button>'; }).join("") + '</div><p class="mnow" id="mphase">' + (mus.beat && bt.phase ? "Agora: " + bt.phase : "") + '</p><div class="mrow"><span>Ritmo</span><input type="range" min="80" max="170" step="2" value="' + mus.bpm + '" data-act="mbpm" aria-label="Batidas por minuto"><strong id="mbpmv">' + mus.bpm + '</strong></div><p class="mhint">A batida evolui sozinha por 24 minutos (aquecimento, subidas, explosão, respiro e pico) e depois recomeça.</p>';
     } else {
       h += '<p class="mhint">Sugestões do Spotify:</p><div class="mpre">' + PRE.map(function (x, i) { return '<button data-act="mpre" data-i="' + i + '">' + x[0] + '</button>'; }).join("") + '</div>';
       h += '<div class="mrow"><input type="url" id="murl" placeholder="Link do Spotify ou YouTube" value="' + esc(mus.link || "") + '"><button class="mb go" data-act="mload">Carregar</button></div><p class="mhint">Cole o link de uma playlist, álbum ou vídeo. Dica: no Spotify, use Compartilhar → Copiar link.</p>';
@@ -1283,7 +1374,7 @@ var FIG = (function () {
     else if (act === "mtoggle") mtoggle();
     else if (act === "mnext") mnext();
     else if (act === "mpick") mplay(+t.getAttribute("data-i"));
-    else if (act === "msty") { mus.sty = +t.getAttribute("data-i"); mus.bpm = STY[mus.sty].bpm; bt.n = 0; mdraw(); }
+    else if (act === "msty") { mus.sty = +t.getAttribute("data-i"); mus.bpm = STY[mus.sty].bpm; bt.n = 0; bt.t0 = bt.next; bt.phase = ""; mdraw(); }
     else if (act === "mpre") {
       var pr = PRE[+t.getAttribute("data-i")];
       mus.embed = { src: "https://open.spotify.com/embed/playlist/" + pr[1], h: 352 };
