@@ -965,10 +965,21 @@ var FIG = (function () {
   /* ---------- cronômetro ---------- */
   var timer = { end: 0, h: null, nodes: [], vib: {} };
   var ac = null;
+  var mix = null, mel = null;
   function getAc() {
     try {
-      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-      if (ac.state === "suspended") ac.resume();
+      if (!ac) {
+        ac = new (window.AudioContext || window.webkitAudioContext)();
+        mix = ac.createGain(); mix.gain.value = 1;
+        /* sai por um elemento de mídia: no iPhone o som toca mesmo com o modo silencioso ligado */
+        try {
+          var md = ac.createMediaStreamDestination();
+          mix.connect(md);
+          mel = new Audio(); mel.srcObject = md.stream; mel.setAttribute("playsinline", "");
+        } catch (e) { mel = null; mix.connect(ac.destination); }
+      }
+      if (ac.state !== "running") ac.resume();
+      if (mel && mel.paused) { var pr = mel.play(); if (pr && pr.catch) pr.catch(function () { /* aguarda novo toque */ }); }
     } catch (e) { ac = null; }
     return ac;
   }
@@ -982,7 +993,7 @@ var FIG = (function () {
       g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
       g.gain.setValueAtTime(vol, t0 + dur - 0.04);
       g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      o.connect(g); g.connect(c.destination);
+      o.connect(g); g.connect(mix);
       o.start(t0); o.stop(t0 + dur + 0.02);
       if (keep) timer.nodes.push(o);
     } catch (e) { /* sem som */ }
@@ -1129,8 +1140,8 @@ var FIG = (function () {
   function beatHit(t, kind) {
     var c = ac; if (!c || !bt.gain) return;
     var o = c.createOscillator(), g = c.createGain();
-    if (kind === "k") { o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.start(t); o.stop(t + 0.2); }
-    else if (kind === "s") { o.type = "triangle"; o.frequency.setValueAtTime(220, t); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.1); o.start(t); o.stop(t + 0.12); }
+    if (kind === "k") { o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25); o.start(t); o.stop(t + 0.27); }
+    else if (kind === "s") { o.type = "triangle"; o.frequency.setValueAtTime(220, t); g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.12); o.start(t); o.stop(t + 0.12); }
     else { o.type = "square"; o.frequency.setValueAtTime(7000, t); g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04); o.start(t); o.stop(t + 0.05); }
     o.connect(g); g.connect(bt.gain);
   }
@@ -1148,10 +1159,11 @@ var FIG = (function () {
   function beatStart() {
     var c = getAc(); if (!c) { toast("Sem suporte a áudio neste aparelho"); return; }
     audio.pause();
-    if (!bt.gain) { bt.gain = c.createGain(); bt.gain.connect(c.destination); }
-    bt.gain.gain.value = mus.vol * 0.8;
-    mus.beat = true; bt.next = c.currentTime + 0.05; bt.n = 0;
-    clearInterval(bt.h); bt.h = setInterval(beatSched, 40); beatSched();
+    if (!bt.gain) { bt.gain = c.createGain(); bt.gain.connect(mix); }
+    bt.gain.gain.value = mus.vol;
+    mus.beat = true; bt.n = 0;
+    var go = function () { bt.next = c.currentTime + 0.1; clearInterval(bt.h); bt.h = setInterval(beatSched, 40); beatSched(); };
+    if (c.state === "running") go(); else c.resume().then(go, go);
   }
   function beatStop() { mus.beat = false; clearInterval(bt.h); bt.h = null; }
   function embedUrl(u) {
@@ -1254,7 +1266,7 @@ var FIG = (function () {
   });
   document.addEventListener("input", function (ev) {
     var a = ev.target && ev.target.getAttribute && ev.target.getAttribute("data-act");
-    if (a === "mvol") { mus.vol = ev.target.value / 100; audio.volume = mus.vol; if (bt.gain) bt.gain.gain.value = mus.vol * 0.8; return; }
+    if (a === "mvol") { mus.vol = ev.target.value / 100; audio.volume = mus.vol; if (bt.gain) bt.gain.gain.value = mus.vol; return; }
     if (a === "mbpm") { mus.bpm = +ev.target.value; var v = $("#mbpmv"); if (v) v.textContent = mus.bpm; return; }
     if (ev.target && ev.target.id === "busca") { state.q = ev.target.value; updateEx(); }
   });
