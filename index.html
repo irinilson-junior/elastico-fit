@@ -191,6 +191,36 @@ ul.exs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction:
 }
 .toast.on { opacity: 1; }
 
+
+/* música */
+.mbtn { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); background: transparent; border-radius: 50%; color: var(--muted); flex: none; }
+.mbtn[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.mbtn.on svg { animation: mpulse 1s ease-in-out infinite alternate; }
+@keyframes mpulse { to { transform: scale(1.15); } }
+.msheet { position: fixed; left: 0; right: 0; bottom: var(--nav-h); z-index: 9; background: var(--surface); border-top: 1px solid var(--line); border-radius: 14px 14px 0 0; box-shadow: 0 -8px 30px rgba(0,0,0,.18); padding: 14px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); max-height: 70vh; overflow-y: auto; transform: translateY(110%); visibility: hidden; transition: transform .25s, visibility 0s .25s; }
+.msheet.open { transform: none; visibility: visible; transition: transform .25s; }
+.msheet h2 { font-family: var(--display); font-size: 22px; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 10px; display: flex; align-items: center; }
+.msheet h2 button { margin-left: auto; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--muted); font-weight: 600; }
+.mtabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.mtabs button { flex: 1; min-height: 44px; border: 1px solid var(--line); background: transparent; border-radius: 8px; font-weight: 600; font-size: 14px; }
+.mtabs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.mrow { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+.mrow label.pick, .mrow button.mb { min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-weight: 600; cursor: pointer; }
+.mrow button.go { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.mrow input[type=range] { flex: 1; min-height: 44px; accent-color: var(--accent); }
+.mrow input[type=url] { flex: 1; min-height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 0; }
+.mnow { font-weight: 600; margin: 8px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mhint { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+.mlist { margin: 8px 0 0; padding: 0; list-style: none; }
+.mlist button { width: 100%; text-align: left; min-height: 44px; padding: 0 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mlist .cur { color: var(--accent); font-weight: 700; }
+.mfr { margin-top: 10px; } .mfr iframe { width: 100%; border: 0; border-radius: 12px; }
+.mfr.hide { height: 0; overflow: hidden; margin: 0; }
+.timer.warn { background: #B3261E; color: #fff; }
+.timer.warn strong { animation: mpulse .5s ease-in-out infinite alternate; }
+@media (max-width: 420px) { .brand-sub { display: none; } .mbtn { margin-left: auto; } }
+@media (prefers-reduced-motion: reduce) { .mbtn.on svg, .timer.warn strong { animation: none; } .msheet { transition: none; } }
+
 /* barra inferior */
 .tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--surface); border-top: 1px solid var(--line);
@@ -205,16 +235,17 @@ ul.exs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction:
 </head>
 <body>
 
-
 <header class="top">
   <div class="wrap">
     <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="12.5" ry="6.5" transform="rotate(-32 16 16)" fill="none" stroke="var(--accent)" stroke-width="4"/></svg>
     <div class="brand">Elástico Fit</div>
     <div class="brand-sub">treinos com bandas</div>
+    <button class="mbtn" id="mbtn" data-act="mopen" aria-label="Música de treino" aria-pressed="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></button>
   </div>
 </header>
 <main id="view" class="wrap"></main>
 <div id="timer" class="timer" hidden></div>
+<section id="msheet" class="msheet" aria-label="Música de treino"></section>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <nav class="tabs" aria-label="Seções">
   <a id="t-programas" href="#programas"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 10h18M8 2.5v4M16 2.5v4"/></svg>Programas</a>
@@ -619,7 +650,6 @@ var FIG = (function () {
 })();
 
 
-
   /* ---------- dados ---------- */
   var BANDAS = {
     amarelo: { n: "Amarelo", d: "leve" },
@@ -933,42 +963,72 @@ var FIG = (function () {
   }
 
   /* ---------- cronômetro ---------- */
-  var timer = { end: 0, h: null };
+  var timer = { end: 0, h: null, nodes: [], vib: {} };
   var ac = null;
-  function beep() {
+  function getAc() {
     try {
       if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-      var o = ac.createOscillator(), g = ac.createGain();
-      o.frequency.value = 880; g.gain.value = 0.15; o.connect(g); g.connect(ac.destination);
-      o.start(); o.stop(ac.currentTime + 0.35);
-    } catch (e) { /* sem som */ }
-    try { if (navigator.vibrate) navigator.vibrate(250); } catch (e) { /* sem vibração */ }
+      if (ac.state === "suspended") ac.resume();
+    } catch (e) { ac = null; }
+    return ac;
   }
+  /* bipe agendado no relógio de áudio: sai na hora certa mesmo se a aba ficar lenta */
+  function tone(freq, at, dur, vol, keep) {
+    var c = getAc(); if (!c) return;
+    try {
+      var o = c.createOscillator(), g = c.createGain(), t0 = c.currentTime + Math.max(0, at);
+      o.type = "square"; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+      g.gain.setValueAtTime(vol, t0 + dur - 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(t0); o.stop(t0 + dur + 0.02);
+      if (keep) timer.nodes.push(o);
+    } catch (e) { /* sem som */ }
+  }
+  function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* sem vibração */ } }
   function fmt(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
   function drawTimer() {
     var el = $("#timer");
     if (state.view !== "detail") { el.hidden = true; return; }
     el.hidden = false;
+    el.classList.remove("warn");
     if (timer.end > Date.now()) {
       el.innerHTML = '<span class="tl">Descansando</span><strong id="tcount">' + fmt(timer.end - Date.now()) + '</strong><button class="stop" data-act="tstop">Parar</button>';
     } else {
       el.innerHTML = '<span class="tl">Descanso</span><div class="tp">' + [20, 30, 45, 60, 90].map(function (s) { return '<button data-act="tstart" data-s="' + s + '">' + s + ' s</button>'; }).join("") + '</div>';
     }
   }
+  function cancelTones() {
+    timer.nodes.forEach(function (o) { try { o.stop(); } catch (e) { /* já parou */ } });
+    timer.nodes = [];
+  }
   function tick() {
-    var c = $("#tcount");
-    if (timer.end > Date.now()) { if (c) c.textContent = fmt(timer.end - Date.now()); return; }
+    var c = $("#tcount"), rem = timer.end - Date.now();
+    if (rem > 0) {
+      if (c) c.textContent = fmt(rem);
+      var left = Math.ceil(rem / 1000);
+      if (left <= 3) {
+        var el = $("#timer"); if (el) el.classList.add("warn");
+        if (!timer.vib[left]) { timer.vib[left] = 1; buzz(120); }
+      }
+      return;
+    }
     clearInterval(timer.h); timer.h = null;
-    if (timer.end) { timer.end = 0; beep(); toast("Descanso terminou"); }
+    if (timer.end) { timer.end = 0; buzz([300, 100, 300]); toast("Descanso terminou"); }
     drawTimer();
   }
   function tstart(s) {
-    try { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { /* sem som */ }
-    timer.end = Date.now() + s * 1000;
-    clearInterval(timer.h); timer.h = setInterval(tick, 250);
+    cancelTones();
+    timer.end = Date.now() + s * 1000; timer.vib = {};
+    /* bipes curtos com 3, 2 e 1 segundo restantes e um tom longo no fim */
+    [3, 2, 1].forEach(function (k) { if (s >= k) tone(1000, s - k, 0.18, 0.35, true); });
+    tone(1500, s, 0.7, 0.4, true);
+    clearInterval(timer.h); timer.h = setInterval(tick, 200);
     drawTimer();
   }
-  function tstop() { timer.end = 0; clearInterval(timer.h); timer.h = null; drawTimer(); }
+  function tstop() { cancelTones(); timer.end = 0; clearInterval(timer.h); timer.h = null; drawTimer(); }
 
   /* ---------- tela sempre ligada durante o treino ---------- */
   var wl = null;
@@ -1038,6 +1098,106 @@ var FIG = (function () {
   }
   window.addEventListener("hashchange", route);
 
+  /* ---------- música de treino ---------- */
+  var EMBED = true;
+  var mus = { open: false, tab: "arquivos", list: [], i: -1, vol: 0.7, bpm: 120, beat: false, embed: "" };
+  var audio = new Audio();
+  audio.preload = "auto";
+  audio.addEventListener("ended", function () { mnext(); });
+  audio.addEventListener("play", mbtnState);
+  audio.addEventListener("pause", mbtnState);
+  var bt = { h: null, gain: null, next: 0, n: 0 };
+  function playing() { return (!audio.paused && !!audio.src) || mus.beat; }
+  function mbtnState() { var b = $("#mbtn"); if (b) { b.classList.toggle("on", playing()); b.setAttribute("aria-pressed", playing() ? "true" : "false"); } }
+  function mplay(i) {
+    if (!mus.list.length) return;
+    mus.i = (i + mus.list.length) % mus.list.length;
+    beatStop();
+    audio.src = mus.list[mus.i].url; audio.volume = mus.vol;
+    var pr = audio.play(); if (pr && pr.catch) pr.catch(function () { toast("Toque em ▶ para iniciar o som"); });
+    mdraw();
+  }
+  function mnext() { if (mus.list.length) mplay(mus.i + 1); }
+  function mtoggle() {
+    if (mus.tab === "batida") { if (mus.beat) beatStop(); else beatStart(); }
+    else if (mus.tab === "arquivos") {
+      if (!mus.list.length) return;
+      if (audio.src && !audio.paused) audio.pause(); else if (audio.src) audio.play(); else mplay(0);
+    }
+    mbtnState(); mdraw();
+  }
+  function beatHit(t, kind) {
+    var c = ac; if (!c || !bt.gain) return;
+    var o = c.createOscillator(), g = c.createGain();
+    if (kind === "k") { o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.start(t); o.stop(t + 0.2); }
+    else if (kind === "s") { o.type = "triangle"; o.frequency.setValueAtTime(220, t); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.1); o.start(t); o.stop(t + 0.12); }
+    else { o.type = "square"; o.frequency.setValueAtTime(7000, t); g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04); o.start(t); o.stop(t + 0.05); }
+    o.connect(g); g.connect(bt.gain);
+  }
+  function beatSched() {
+    var c = ac; if (!c) return;
+    var step = 60 / mus.bpm / 2;
+    while (bt.next < c.currentTime + 0.2) {
+      var n = bt.n % 8;
+      if (n % 4 === 0) beatHit(bt.next, "k");
+      if (n === 2 || n === 6) beatHit(bt.next, "s");
+      if (n % 2 === 1 || n === 4) beatHit(bt.next, "h");
+      bt.next += step; bt.n++;
+    }
+  }
+  function beatStart() {
+    var c = getAc(); if (!c) { toast("Sem suporte a áudio neste aparelho"); return; }
+    audio.pause();
+    if (!bt.gain) { bt.gain = c.createGain(); bt.gain.connect(c.destination); }
+    bt.gain.gain.value = mus.vol * 0.8;
+    mus.beat = true; bt.next = c.currentTime + 0.05; bt.n = 0;
+    clearInterval(bt.h); bt.h = setInterval(beatSched, 40); beatSched();
+  }
+  function beatStop() { mus.beat = false; clearInterval(bt.h); bt.h = null; }
+  function embedUrl(u) {
+    u = (u || "").trim(); var m;
+    if ((m = u.match(/open\.spotify\.com\/(?:intl-[a-z]+\/)?(playlist|album|track|episode|show)\/([A-Za-z0-9]+)/))) return { src: "https://open.spotify.com/embed/" + m[1] + "/" + m[2], h: m[1] === "track" || m[1] === "episode" ? 152 : 352 };
+    if ((m = u.match(/[?&]list=([A-Za-z0-9_-]+)/)) && /youtu/.test(u)) return { src: "https://www.youtube.com/embed/videoseries?list=" + m[1], h: 220 };
+    if ((m = u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([A-Za-z0-9_-]{11})/))) return { src: "https://www.youtube.com/embed/" + m[1], h: 220 };
+    return null;
+  }
+  function mdraw() {
+    var sh = $("#msheet"); if (!sh) return;
+    sh.classList.toggle("open", mus.open);
+    if (!mus.open) return;
+    var tabs = [["arquivos", "Meus arquivos"], ["batida", "Batida"]];
+    if (EMBED) tabs.splice(1, 0, ["playlist", "Playlist"]);
+    var h = '<h2>Música<button data-act="mclose">Fechar</button></h2><div class="mtabs">' + tabs.map(function (t) { return '<button data-act="mtab" data-v="' + t[0] + '" aria-pressed="' + (mus.tab === t[0]) + '">' + t[1] + '</button>'; }).join("") + '</div>';
+    var fr = sh.querySelector(".mfr");
+    if (mus.tab === "arquivos") {
+      h += '<div class="mrow"><label class="pick">Escolher músicas<input type="file" id="mfiles" accept="audio/*" multiple class="sr"></label>' +
+        '<button class="mb go" data-act="mtoggle" ' + (mus.list.length ? "" : "disabled") + '>' + (!audio.paused && audio.src ? "Pausar" : "Tocar") + '</button><button class="mb" data-act="mnext" aria-label="Próxima música" ' + (mus.list.length > 1 ? "" : "disabled") + '>⏭</button></div>';
+      if (mus.i >= 0 && mus.list[mus.i]) h += '<p class="mnow">♪ ' + esc(mus.list[mus.i].name) + '</p>';
+      h += '<ul class="mlist">' + mus.list.map(function (m, i) { return '<li><button data-act="mpick" data-i="' + i + '"' + (i === mus.i ? ' class="cur"' : '') + '>' + esc(m.name) + '</button></li>'; }).join("") + '</ul>';
+      if (!mus.list.length) h += '<p class="mhint">Escolha músicas do seu celular (MP3, M4A...). Elas tocam enquanto você treina; nada é enviado para a internet.</p>';
+    } else if (mus.tab === "batida") {
+      h += '<div class="mrow"><button class="mb go" data-act="mtoggle">' + (mus.beat ? "Parar batida" : "Iniciar batida") + '</button></div>' +
+        '<div class="mrow"><span>Ritmo</span><input type="range" min="90" max="160" step="2" value="' + mus.bpm + '" data-act="mbpm" aria-label="Batidas por minuto"><strong id="mbpmv">' + mus.bpm + '</strong></div>';
+    } else {
+      h += '<div class="mrow"><input type="url" id="murl" placeholder="Link do Spotify ou YouTube" value="' + esc(mus.link || "") + '"><button class="mb go" data-act="mload">Carregar</button></div><p class="mhint">Cole o link de uma playlist, álbum ou vídeo. Dica: no Spotify, use Compartilhar → Copiar link.</p>';
+    }
+    h += '<div class="mrow"><span aria-hidden="true">🔈</span><input type="range" min="0" max="100" value="' + Math.round(mus.vol * 100) + '" data-act="mvol" aria-label="Volume da música"></div>';
+    sh.innerHTML = h + '<div class="mfr' + (mus.tab === "playlist" ? "" : " hide") + '"></div>';
+    var nf = sh.querySelector(".mfr");
+    if (fr) { while (fr.firstChild) nf.appendChild(fr.firstChild); }
+    else if (mus.embed) mfrSet();
+  }
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function mfrSet() {
+    var f = $("#msheet .mfr"); if (!f) return;
+    f.innerHTML = mus.embed ? '<iframe src="' + mus.embed.src + '" height="' + mus.embed.h + '" allow="autoplay; encrypted-media" loading="lazy" title="Playlist"></iframe>' : "";
+  }
+  function mfiles(files) {
+    var add = [].slice.call(files).filter(function (f) { return /^audio\//.test(f.type) || /\.(mp3|m4a|aac|wav|ogg|flac)$/i.test(f.name); });
+    add.forEach(function (f) { mus.list.push({ name: f.name.replace(/\.[^.]+$/, ""), url: URL.createObjectURL(f) }); });
+    if (add.length && (mus.i < 0 || audio.paused)) mplay(mus.i < 0 ? 0 : mus.i); else mdraw();
+  }
+
   /* ---------- ações ---------- */
   document.addEventListener("click", function (ev) {
     var t = ev.target.closest("[data-act]");
@@ -1069,6 +1229,18 @@ var FIG = (function () {
       toast("Treino registrado em Progresso");
       render();
     }
+    else if (act === "mopen") { getAc(); mus.open = !mus.open; mdraw(); }
+    else if (act === "mclose") { mus.open = false; mdraw(); }
+    else if (act === "mtab") { mus.tab = t.getAttribute("data-v"); mdraw(); }
+    else if (act === "mtoggle") mtoggle();
+    else if (act === "mnext") mnext();
+    else if (act === "mpick") mplay(+t.getAttribute("data-i"));
+    else if (act === "mload") {
+      var inp = $("#murl"), e = embedUrl(inp && inp.value);
+      mus.link = inp ? inp.value : "";
+      if (!e) { toast("Link não reconhecido"); }
+      else { mus.embed = e; beatStop(); audio.pause(); mfrSet(); mbtnState(); }
+    }
     else if (act === "tstart") tstart(+t.getAttribute("data-s"));
     else if (act === "tstop") tstop();
     else if (act === "clear") {
@@ -1077,7 +1249,13 @@ var FIG = (function () {
       render();
     }
   });
+  document.addEventListener("change", function (ev) {
+    if (ev.target && ev.target.id === "mfiles") { mfiles(ev.target.files); ev.target.value = ""; }
+  });
   document.addEventListener("input", function (ev) {
+    var a = ev.target && ev.target.getAttribute && ev.target.getAttribute("data-act");
+    if (a === "mvol") { mus.vol = ev.target.value / 100; audio.volume = mus.vol; if (bt.gain) bt.gain.gain.value = mus.vol * 0.8; return; }
+    if (a === "mbpm") { mus.bpm = +ev.target.value; var v = $("#mbpmv"); if (v) v.textContent = mus.bpm; return; }
     if (ev.target && ev.target.id === "busca") { state.q = ev.target.value; updateEx(); }
   });
 
