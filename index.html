@@ -214,6 +214,8 @@ ul.exs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction:
 .mlist { margin: 8px 0 0; padding: 0; list-style: none; }
 .mlist button { width: 100%; text-align: left; min-height: 44px; padding: 0 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mlist .cur { color: var(--accent); font-weight: 700; }
+.mpre { display: flex; flex-wrap: wrap; gap: 6px; } .mpre button { min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 22px; background: var(--bg); font-weight: 600; font-size: 14px; }
+.mpre button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .mfr { margin-top: 10px; } .mfr iframe { width: 100%; border: 0; border-radius: 12px; }
 .mfr.hide { height: 0; overflow: hidden; margin: 0; }
 .timer.warn { background: #B3261E; color: #fff; }
@@ -1111,7 +1113,7 @@ var FIG = (function () {
 
   /* ---------- música de treino ---------- */
   var EMBED = true;
-  var mus = { open: false, tab: "arquivos", list: [], i: -1, vol: 0.7, bpm: 120, beat: false, embed: "" };
+  var mus = { open: false, tab: "arquivos", list: [], i: -1, vol: 0.7, bpm: 120, beat: false, sty: 0, embed: "" };
   var audio = new Audio();
   audio.preload = "auto";
   audio.addEventListener("ended", function () { mnext(); });
@@ -1137,22 +1139,54 @@ var FIG = (function () {
     }
     mbtnState(); mdraw();
   }
-  function beatHit(t, kind) {
-    var c = ac; if (!c || !bt.gain) return;
-    var o = c.createOscillator(), g = c.createGain();
-    if (kind === "k") { o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.12); g.gain.setValueAtTime(1, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25); o.start(t); o.stop(t + 0.27); }
-    else if (kind === "s") { o.type = "triangle"; o.frequency.setValueAtTime(220, t); g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.12); o.start(t); o.stop(t + 0.12); }
-    else { o.type = "square"; o.frequency.setValueAtTime(7000, t); g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04); o.start(t); o.stop(t + 0.05); }
-    o.connect(g); g.connect(bt.gain);
+  /* estilos de batida: 16 passos por compasso (x = toca, o = toque fraco) */
+  var N = null;
+  var STY = [
+    { n: "Eletrônica", bpm: 128, k: "x...x...x...x...", c: "....x.......x...", h: "o.o.o.o.o.o.o.o.", o: "..x...x...x...x.", bass: "saw", arp: [0, 12, 7, 12, 3, 12, 7, 15], line: [N, N, 0, N, N, N, 0, N, N, N, 3, N, N, N, 5, N] },
+    { n: "Funk", bpm: 130, k: "x..x..x...x.x...", c: "....x..x....x..x", h: "x.x.x.x.x.x.x.x.", o: "......x.......x.", bass: "808", line: [0, N, N, 0, N, N, 3, N, N, N, 0, N, -2, N, N, N] },
+    { n: "Trap", bpm: 140, k: "x......x..x.....", c: "........x.......", h: "x.x.x.x.x.x.xxxx", o: "......x.........", bass: "808", line: [0, N, N, N, N, N, N, 0, N, N, -2, N, N, N, N, N] },
+    { n: "Rock", bpm: 120, k: "x.......x.x.....", c: "....x.......x...", sn: true, h: "x.x.x.x.x.x.x.x.", o: "", bass: "saw", line: [0, N, 0, N, 0, N, 0, N, 3, N, 3, N, 5, N, 5, N] }
+  ];
+  var nbuf = null;
+  function noiseSrc(c) {
+    if (!nbuf) { nbuf = c.createBuffer(1, c.sampleRate * 0.5, c.sampleRate); var d = nbuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    var n = c.createBufferSource(); n.buffer = nbuf; return n;
   }
+  function nz(t, dur, type, freq, vol) {
+    var c = ac, n = noiseSrc(c), f = c.createBiquadFilter(), g = c.createGain();
+    f.type = type; f.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    n.connect(f); f.connect(g); g.connect(bt.gain); n.start(t); n.stop(t + dur + 0.02);
+  }
+  function osc(t, type, f0, f1, dur, vol, lp) {
+    var c = ac, o = c.createOscillator(), g = c.createGain(), out = g;
+    o.type = type; o.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.5);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g);
+    if (lp) { var f = c.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = lp; g.connect(f); out = f; }
+    out.connect(bt.gain); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function hz(semi, base) { return base * Math.pow(2, semi / 12); }
   function beatSched() {
-    var c = ac; if (!c) return;
-    var step = 60 / mus.bpm / 2;
+    var c = ac; if (!c || !bt.gain) return;
+    var st = STY[mus.sty], step = 60 / mus.bpm / 4;
     while (bt.next < c.currentTime + 0.2) {
-      var n = bt.n % 8;
-      if (n % 4 === 0) beatHit(bt.next, "k");
-      if (n === 2 || n === 6) beatHit(bt.next, "s");
-      if (n % 2 === 1 || n === 4) beatHit(bt.next, "h");
+      var i = bt.n % 16, t = bt.next;
+      if (st.k.charAt(i) === "x") { osc(t, "sine", 170, 42, 0.28, 1); nz(t, 0.02, "highpass", 3000, 0.4); }
+      if (st.c.charAt(i) === "x") {
+        if (st.sn) { osc(t, "triangle", 230, 180, 0.12, 0.6); nz(t, 0.16, "highpass", 1500, 0.7); }
+        else { nz(t, 0.04, "bandpass", 1500, 0.8); nz(t + 0.014, 0.05, "bandpass", 1500, 0.8); nz(t + 0.03, 0.2, "bandpass", 1200, 0.7); }
+      }
+      var h = st.h.charAt(i);
+      if (h === "x") nz(t, 0.05, "highpass", 8000, 0.35); else if (h === "o") nz(t, 0.04, "highpass", 8000, 0.18);
+      if (st.o.charAt(i) === "x") nz(t, 0.22, "highpass", 7000, 0.3);
+      var sm = st.line[i];
+      if (sm !== null) {
+        if (st.bass === "808") osc(t, "sine", hz(sm, 55) * 1.5, hz(sm, 55), 0.45, 0.9);
+        else osc(t, "sawtooth", hz(sm, 55), hz(sm, 55), step * 1.8, 0.45, 500);
+      }
+      if (st.arp && i % 2 === 0) osc(t, "square", hz(st.arp[(i / 2) % st.arp.length], 220), hz(st.arp[(i / 2) % st.arp.length], 220), step * 1.6, 0.1, 2200);
       bt.next += step; bt.n++;
     }
   }
@@ -1173,6 +1207,7 @@ var FIG = (function () {
     if ((m = u.match(/(?:youtu\.be\/|[?&]v=|embed\/)([A-Za-z0-9_-]{11})/))) return { src: "https://www.youtube.com/embed/" + m[1], h: 220 };
     return null;
   }
+  var PRE = [["Treino pesado (rock e hip hop)", "0ZGBLIj8vl2ffKqgCMEggm"], ["Treino animado", "0LWeZlJrpD2ZUmEWIf3OrY"], ["Treino intenso", "25z1HpBBwH8KLmTBd3M9S8"], ["Funk e eletrônica", "7l8p9ENvg2X78aGh7FBhQd"]];
   function mdraw() {
     var sh = $("#msheet"); if (!sh) return;
     sh.classList.toggle("open", mus.open);
@@ -1189,8 +1224,9 @@ var FIG = (function () {
       if (!mus.list.length) h += '<p class="mhint">Escolha músicas do seu celular (MP3, M4A...). Elas tocam enquanto você treina; nada é enviado para a internet.</p>';
     } else if (mus.tab === "batida") {
       h += '<div class="mrow"><button class="mb go" data-act="mtoggle">' + (mus.beat ? "Parar batida" : "Iniciar batida") + '</button></div>' +
-        '<div class="mrow"><span>Ritmo</span><input type="range" min="90" max="160" step="2" value="' + mus.bpm + '" data-act="mbpm" aria-label="Batidas por minuto"><strong id="mbpmv">' + mus.bpm + '</strong></div>';
+        '<div class="mpre">' + STY.map(function (x, i) { return '<button data-act="msty" data-i="' + i + '" aria-pressed="' + (mus.sty === i) + '">' + x.n + '</button>'; }).join("") + '</div><div class="mrow"><span>Ritmo</span><input type="range" min="80" max="170" step="2" value="' + mus.bpm + '" data-act="mbpm" aria-label="Batidas por minuto"><strong id="mbpmv">' + mus.bpm + '</strong></div>';
     } else {
+      h += '<p class="mhint">Sugestões do Spotify:</p><div class="mpre">' + PRE.map(function (x, i) { return '<button data-act="mpre" data-i="' + i + '">' + x[0] + '</button>'; }).join("") + '</div>';
       h += '<div class="mrow"><input type="url" id="murl" placeholder="Link do Spotify ou YouTube" value="' + esc(mus.link || "") + '"><button class="mb go" data-act="mload">Carregar</button></div><p class="mhint">Cole o link de uma playlist, álbum ou vídeo. Dica: no Spotify, use Compartilhar → Copiar link.</p>';
     }
     h += '<div class="mrow"><span aria-hidden="true">🔈</span><input type="range" min="0" max="100" value="' + Math.round(mus.vol * 100) + '" data-act="mvol" aria-label="Volume da música"></div>';
@@ -1247,6 +1283,13 @@ var FIG = (function () {
     else if (act === "mtoggle") mtoggle();
     else if (act === "mnext") mnext();
     else if (act === "mpick") mplay(+t.getAttribute("data-i"));
+    else if (act === "msty") { mus.sty = +t.getAttribute("data-i"); mus.bpm = STY[mus.sty].bpm; bt.n = 0; mdraw(); }
+    else if (act === "mpre") {
+      var pr = PRE[+t.getAttribute("data-i")];
+      mus.embed = { src: "https://open.spotify.com/embed/playlist/" + pr[1], h: 352 };
+      mus.link = "https://open.spotify.com/playlist/" + pr[1];
+      beatStop(); audio.pause(); mfrSet(); mbtnState(); var u = $("#murl"); if (u) u.value = mus.link;
+    }
     else if (act === "mload") {
       var inp = $("#murl"), e = embedUrl(inp && inp.value);
       mus.link = inp ? inp.value : "";
